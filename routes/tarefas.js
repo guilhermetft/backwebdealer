@@ -18,6 +18,19 @@ router.get("/tarefas", async (req, res) => {
   return res.json(data);
 });
 
+router.get("/usuarios", async (req, res) => {
+  const { data, error } = await supabase
+    .from("tb_usuarios")
+    .select("*"); // pega todos os usuários
+
+  if (error) {
+    console.error("Erro Supabase ao buscar usuários:", error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.json(data);
+});
+
 router.post("/tarefas", async (req, res) => {
   console.log("Dados recebidos no POST:", req.body);
 
