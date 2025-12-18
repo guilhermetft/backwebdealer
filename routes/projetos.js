@@ -118,7 +118,11 @@ router.put("/projetos/:id", async (req, res) => {
   const { id } = req.params;
   const { name, description, status, deadline, participants } = req.body;
 
+  // Garante que o ID seja um número para evitar erros de tipo no Postgres
+  const projetoId = parseInt(id);
+
   try {
+    // 1. Atualiza os dados básicos do projeto
     const { data: updatedProject, error } = await supabase
       .from("tb_projeto")
       .update({
@@ -127,31 +131,42 @@ router.put("/projetos/:id", async (req, res) => {
         status,
         prazo: deadline
       })
-      .eq("id_projeto", id)
+      .eq("id_projeto", projetoId) // Usando o ID convertido
       .select()
       .single();
 
     if (error) throw error;
 
-    if (participants) {
-      // Deleta os antigos
-      await supabase.from("tb_projeto_usuario").delete().eq("id_projeto", id);
+    // 2. Atualiza os participantes
+    if (participants && Array.isArray(participants)) {
+      console.log(`Atualizando participantes para o projeto ${projetoId}:`, participants);
 
-      // Insere os novos
-      const participantRows = participants.map(userId => ({
-        id_projeto: id,
-        id_usuario: userId
-      }));
-      const { error: errorParticipants } = await supabase
+      // Remove vínculos antigos
+      const { error: delError } = await supabase
         .from("tb_projeto_usuario")
-        .insert(participantRows);
+        .delete()
+        .eq("id_projeto", projetoId);
 
-      if (errorParticipants) throw errorParticipants;
+      if (delError) throw delError;
+
+      // Insere novos vínculos se houver participantes no array
+      if (participants.length > 0) {
+        const participantRows = participants.map(userId => ({
+          id_projeto: projetoId, // Usando o ID convertido
+          id_usuario: userId
+        }));
+
+        const { error: insError } = await supabase
+          .from("tb_projeto_usuario")
+          .insert(participantRows);
+
+        if (insError) throw insError;
+      }
     }
 
     res.json(updatedProject);
   } catch (err) {
-    console.error("Erro ao atualizar projeto:", err);
+    console.error("Erro detalhado ao atualizar projeto:", err);
     res.status(500).json({ error: err.message });
   }
 });
