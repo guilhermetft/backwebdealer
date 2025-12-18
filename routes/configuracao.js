@@ -1,12 +1,10 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const router = express.Router();
 
+// O cliente deve usar as variáveis que já foram carregadas no server.js
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
@@ -32,6 +30,7 @@ router.put("/:id", async (req, res) => {
   const body = req.body;
 
   try {
+    // CASO 1: Atualização de Senha
     if (body.nova_senha) {
       const { data: userPasswordData, error: userError } = await supabase
         .from("tb_usuario")
@@ -57,18 +56,20 @@ router.put("/:id", async (req, res) => {
         .eq("id_usuario", id);
 
       if (updateError) throw updateError;
-
       return res.json({ message: "Senha atualizada com sucesso." });
 
-    } else {
+    } 
+    // CASO 2: Atualização de Perfil
+    else {
       const { nome_usuario, email_usuario, telefone, empresa_usuario, cargo } = body;
 
+      // Montamos o objeto apenas com o que veio para evitar erros de undefined
       const profileUpdates = {
         nome_usuario,
         email_usuario,
-        telefone,
-        empresa_usuario,
-        cargo
+        telefone: telefone || null,
+        empresa_usuario: empresa_usuario || null,
+        cargo: cargo || null
       };
 
       const { data, error } = await supabase
@@ -79,12 +80,12 @@ router.put("/:id", async (req, res) => {
         .single();
 
       if (error) throw error;
-
       return res.json(data);
     }
 
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Erro na rota de configuração:", error.message);
+    return res.status(500).json({ error: "Erro interno no servidor." });
   }
 });
 
