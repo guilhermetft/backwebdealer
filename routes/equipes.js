@@ -41,7 +41,7 @@ router.get("/usuarios", async (req, res) => {
 // Listar equipes (COM membros)
 router.get("/equipes", async (req, res) => {
   const { data, error } = await supabase
-    .from("tb_equipe")
+    .from("tb_equipes")
     .select(`
       id_equipe,
       titulo_equipe,
@@ -94,7 +94,7 @@ router.post("/equipes", async (req, res) => {
   }
 
   const { data: equipe, error } = await supabase
-    .from("tb_equipe")
+    .from("tb_equipes")
     .insert([
       {
         titulo_equipe: name,
@@ -124,7 +124,7 @@ router.delete("/equipes/:idEquipe", async (req, res) => {
   const { idEquipe } = req.params;
 
   await supabase.from("tb_membros").delete().eq("id_equipes", idEquipe);
-  await supabase.from("tb_equipe").delete().eq("id_equipe", idEquipe);
+  await supabase.from("tb_equipes").delete().eq("id_equipe", idEquipe);
 
   res.json({ message: "Equipe excluída com sucesso." });
 });
@@ -158,7 +158,7 @@ router.delete(
     const { idEquipe, idUsuario } = req.params;
 
     const { data: equipe } = await supabase
-      .from("tb_equipe")
+      .from("tb_equipes")
       .select("lider_id")
       .eq("id_equipe", idEquipe)
       .single();

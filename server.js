@@ -26,7 +26,7 @@ app.use(
 app.use(express.json());
 
 app.use("/", cadastroRoutes);
-app.use("/equipes", equipesRoutes);
+app.use("/api", equipesRoutes);
 app.use("/tarefas", tarefasRoutes);
 app.use("/calendario", calendarioRoutes);
 app.use("/chat", chatRoutes);
