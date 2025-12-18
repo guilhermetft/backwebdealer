@@ -10,6 +10,7 @@ import tarefasRoutes from "./routes/tarefas.js";
 import calendarioRoutes from "./routes/calendario.js"; 
 import projetosRoutes from "./routes/projetos.js"; 
 import chatRoutes from "./routes/chat.js";
+import configuracaoRoutes from "./routes/configuracao.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/tarefas", tarefasRoutes);
 app.use("/calendario", calendarioRoutes); 
 app.use("/chat", chatRoutes);
 app.use("/projetos", projetosRoutes);
+app.use("/configuracoes", configuracaoRoutes); 
 
 const port = process.env.PORT || 5000;
 app.listen(port, () =>
