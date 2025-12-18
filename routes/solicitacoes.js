@@ -24,17 +24,19 @@ router.post("/", async (req, res) => {
       .insert([
         {
           titulo_tarefa: titulo,
-          descricao_tarefa: descricao, // Agora a coluna existe!
+          descricao_tarefa: descricao,
           prioridade_tarefa: prioridade,
-          responsavel_tarefa: responsavel_tarefa,
+          // AJUSTE AQUI: Convertendo para número inteiro para evitar o erro de bigint
+          responsavel_tarefa: responsavel_tarefa ? parseInt(responsavel_tarefa) : null,
           prazo_tarefa: prazo_tarefa,
-          status_tarefa: "pending" // Valor padrão
+          status_tarefa: "pending"
         }
       ])
       .select();
 
     if (error) {
       console.error("Erro Supabase:", error.message);
+      // Retornamos o erro exato para ajudar no debug se algo mais falhar
       return res.status(400).json({ error: error.message });
     }
 
@@ -45,7 +47,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET: Buscar usuários (para o select do front)
+// GET: Buscar usuários (Permanece igual)
 router.get("/usuarios", async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -60,7 +62,7 @@ router.get("/usuarios", async (req, res) => {
   }
 });
 
-// GET: Buscar todas as tarefas
+// GET: Buscar todas as tarefas (Permanece igual)
 router.get("/", async (req, res) => {
   try {
     const { data, error } = await supabase
