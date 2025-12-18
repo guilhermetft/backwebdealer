@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-router.get("/tarefas", async (req, res) => {
+router.get("/", async (req, res) => {
   const { data, error } = await supabase
     .from("tb_tarefas")
     .select("*")
@@ -31,7 +31,7 @@ router.get("/usuarios", async (req, res) => {
   return res.json(data);
 });
 
-router.post("/tarefas", async (req, res) => {
+router.post("/", async (req, res) => {
   console.log("Dados recebidos no POST:", req.body);
 
   const {
@@ -63,7 +63,7 @@ router.post("/tarefas", async (req, res) => {
   return res.status(201).json(newTask[0]);
 });
 
-router.put("/tarefas/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const {
     titulo,
@@ -91,7 +91,7 @@ router.put("/tarefas/:id", async (req, res) => {
   return res.json({ message: "Tarefa atualizada com sucesso" });
 });
 
-router.delete("/tarefas/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   const { error } = await supabase

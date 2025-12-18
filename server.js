@@ -27,7 +27,7 @@ app.use("/equipes", equipesRoutes);
 app.use("/tarefas", tarefasRoutes);
 app.use("/calendario", calendarioRoutes); 
 app.use("/chat", chatRoutes);
-app.use(projetosRoutes);
+app.use("/projetos", projetosRoutes);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () =>
