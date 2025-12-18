@@ -6,24 +6,29 @@ dotenv.config();
 
 const router = express.Router();
 
+router.get("/ping", (req, res) => {
+  res.json({ chat: "ok" });
+});
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// get
-router.get("/chat/mensagens", async (req, res) => {
-  const { canal, team_id } = req.query;
+/* ===============================
+   LISTAR MENSAGENS
+================================ */
+router.get("/mensagens", async (req, res) => {
+  const { canal } = req.query;
 
-  if (!canal || !team_id) {
-    return res.status(400).json({ error: "canal e team_id são obrigatórios." });
+  if (!canal) {
+    return res.status(400).json({ error: "Canal é obrigatório." });
   }
 
   const { data, error } = await supabase
-    .from("mensagens")
+    .from("tb_mensagens")
     .select("*")
-    .eq("canal", canal)
-    .eq("team_id", team_id)
+    .eq("chat_canal", canal)
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -34,19 +39,29 @@ router.get("/chat/mensagens", async (req, res) => {
   res.json(data || []);
 });
 
-// post
-router.post("/chat/mensagens", async (req, res) => {
-  const { canal, author, user_id, content, team_id } = req.body;
+/* ===============================
+   ENVIAR MENSAGEM
+================================ */
+router.post("/mensagens", async (req, res) => {
+  const { chat_canal, author_mensagem, user_id, content } = req.body;
 
-  if (!canal || !author || !user_id || !content || !team_id) {
-    return res
-      .status(400)
-      .json({ error: "canal, author, user_id, content e team_id são obrigatórios." });
+  if (!chat_canal || !author_mensagem || !user_id || !content) {
+    return res.status(400).json({
+      error:
+        "chat_canal, author_mensagem, user_id e content são obrigatórios.",
+    });
   }
 
   const { data, error } = await supabase
-    .from("mensagens")
-    .insert([{ canal, author, user_id, content, team_id }])
+    .from("tb_mensagens")
+    .insert([
+      {
+        chat_canal,
+        author_mensagem,
+        user_id,
+        content,
+      },
+    ])
     .select()
     .single();
 
